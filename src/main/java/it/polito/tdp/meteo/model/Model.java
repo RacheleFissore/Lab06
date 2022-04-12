@@ -36,7 +36,7 @@ public class Model {
 	}
 	
 	// of course you can change the String output with what you think works best
-	public void trovaSequenzaRicorsiva(int mese, List<String> parziale, int livello) {
+	/*public void trovaSequenzaRicorsiva(int mese, List<String> parziale, int livello) {
 		// Livello: è il giorno per cui devo decidere in che città stare, quindi la lista di stringhe conterrà 15 città per i primi 15
 		// giorni del mese
 		boolean trovato = true;
@@ -74,7 +74,7 @@ public class Model {
 					 */
 					
 					// Aggiungo la città che sto scorrendo alla lista perchè devo avercela per almeno 3 giorni consecutivi
-					parziale.add(c);
+					/*parziale.add(c);
 					prezzoParziale = this.calcolaPrezzo(mese, parziale);
 					if(prezzoParziale > prezzoMigliore) {
 						// La città che ho aggiunto sopra aicuramente mi porta ad una soluzione peggiore
@@ -104,7 +104,70 @@ public class Model {
 				}
 			}
 		}
+	}*/
+	
+	public void trovaSequenzaRicorsiva(int mese, List<String> parziale, int livello) {
+		// Livello: è il giorno per cui devo decidere in che città stare, quindi la lista di stringhe conterrà 15 città per i primi 15
+		// giorni del mese
+		boolean trovato = true;
+		
+		for(String string : citta) {
+			if(!parziale.contains(string)) {
+				trovato = false;
+			}
+		}
+		
+		if(parziale.size() == NUMERO_GIORNI_TOTALI && trovato) {
+			// TODO: !!!!!! DEVO AGGIUNGERE IL VINCOLO DI AVERE NELLA LISTA TUTTE E 3 LE CITTA !!!!!!!!
+			double prezzoParz = this.calcolaPrezzo(mese, parziale);
+			if(prezzoParz < prezzoMigliore) {
+				prezzoMigliore = prezzoParz;
+				elencoCitta = new ArrayList<String>(parziale);
+			}
+			
+			
+		} else {
+			// Metto i due metodi per il controllo
+			for(String c : citta) {
+				boolean doRicorsione = true;
+				int numGCons = this.giorniConsecutiviPerCitta(c, parziale);
+				int numGNonCons = this.giorniNonConsecutiviPerCitta(c, parziale);
+				if(numGCons < NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN && numGNonCons < NUMERO_GIORNI_CITTA_MAX 
+						&& (livello == 0 || (livello > 0 && parziale.get(livello-1).compareTo(c) == 0)) ) {
+					/*
+					 * livello > 0 --> Non devo essere nel primo giro se no prima non ho niente in parziale e non entra nell'if
+					 * parziale.get(livello-1).compareTo(c) == 0 --> Controllo che la città precedente a quella che sto controllando, cioè 
+					 * che voglio aggiungere, sia la stessa.
+					 * OR
+					 * livello == 0 --> Se sono al primo giro devo sempre inserire la città in parziale 
+					 */
+					
+					// Aggiungo la città che sto scorrendo alla lista perchè devo avercela per almeno 3 giorni consecutivi
+					parziale.add(c);
+					
+				}
+				else if(numGCons >= NUMERO_GIORNI_CITTA_CONSECUTIVI_MIN && numGNonCons < NUMERO_GIORNI_CITTA_MAX) {
+					// Calcolo prezzo per vedere se è migliore di quello prima e se è peggiore del prezzo migliore la città che sto scorrendo
+					// non la aggiunto
+					
+					parziale.add(c); // quando faccio il controllo del prezzo è da aggiungere
+					
+					
+				}
+				else {
+					// Sono nel caso in cui il numero di giorni nella stessa città è maggiore di 6 oppure sto cercando di aggiungere una città
+					// alla lista di parziale senza aver messo 3 volte consecutivamente la stessa città in parziale
+					 doRicorsione = false;
+				}
+				
+				if(doRicorsione) {
+					trovaSequenzaRicorsiva(mese, parziale, livello+1);
+					parziale.remove(parziale.size()-1);
+				}
+			}
+		}
 	}
+	
 	
 	public int giorniConsecutiviPerCitta(String citta, List<String> parziale) {
 		int cnt = 0;
@@ -148,7 +211,7 @@ public class Model {
 			Rilevamento r = this.meteoDao.getRilevamentoLocalitaGiorno(giorno, mese, s);
 			prezzo += r.getUmidita();
 			if(parziale.size() >= 2 && parziale.get(giorno).compareTo(parziale.get(giorno--)) == 0) {
-				prezzo += 100;
+				prezzo += COST;
 			}
 			giorno++;
 		}

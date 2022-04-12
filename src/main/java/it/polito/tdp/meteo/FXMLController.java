@@ -42,7 +42,7 @@ public class FXMLController {
     	txtResult.setText("");
     	this.model.trovaSequenzaRicorsiva(boxMese.getValue(), new ArrayList<String>(), 0);
     	for (String s : this.model.getElencoCitta()) {
-    		this.txtResult.appendText(s);
+    		this.txtResult.appendText(s + " ");
     	}
     }
 
