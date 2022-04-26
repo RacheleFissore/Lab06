@@ -39,18 +39,29 @@ public class FXMLController {
     @FXML
     void doCalcolaSequenza(ActionEvent event) {
     	// Qui richiamo la procedura ricorsiva
-    	txtResult.setText("");
-    	this.model.trovaSequenzaRicorsiva(boxMese.getValue(), new ArrayList<String>(), 0);
-    	for (String s : this.model.getElencoCitta()) {
-    		this.txtResult.appendText(s + " ");
+    	if(boxMese.getValue() != null) {
+    		this.model.trovaSequenzaRicorsiva(boxMese.getValue(), new ArrayList<String>(), 0);
+        	for (String s : this.model.getElencoCitta()) {
+        		this.txtResult.appendText(s + " ");
+        	}
     	}
+    	else {
+    		txtResult.setText("Selezionare un mese");
+    	}
+    	
     }
 
     @FXML
     void doCalcolaUmidita(ActionEvent event) {
     	txtResult.setText("");
-    	String string = model.getUmiditaMedia(boxMese.getValue());
-    	txtResult.setText(string);
+    	if(boxMese.getValue() != null) {
+    		String string = model.getUmiditaMedia(boxMese.getValue());
+        	txtResult.setText(string);
+    	}
+    	else {
+    		txtResult.setText("Selezionare un mese");
+    	}
+    	
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
